@@ -17,7 +17,7 @@ namespace GWO {
 			this.SearchRange = searchRange;
 		}
 
-		public void CalculateFitness(IFunction function) {
+		public void CalculateFitness(EvaluationFunction function) {
 			this.Fitness = function.Evaluate(this.Position);
 		}
 

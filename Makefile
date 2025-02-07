@@ -1,4 +1,4 @@
-SRC_FILES = main.cs gwo\optimizer.cs gwo\agent.cs gwo\vector.cs gwo\function.cs gwo\range.cs
+SRC_FILES = main.cs gwo\optimizer.cs gwo\agent.cs gwo\vector.cs gwo\function.cs gwo\range.cs metaheuristics\metaheuristics.cs
 SRC_DIR = .\src
 TARGET_FILE = main.exe
 

@@ -3,18 +3,22 @@ using GWO;
 
 class GrayWolfOptimizerProgram {
 	static void Main() {
-		Optimizer optimizer = new Optimizer(12, 250);
-
+		EvaluationFunction function = new RosenbrockFunction();
 		uint dimensions = 2;
-
-		IFunction function = new RastriginFunction();
-
-		Vector minimum = optimizer.Optimize(
-			function, dimensions,
-			new Range(Vector.Ones(dimensions) * -10.0,
-			Vector.Ones(dimensions) * 12.0)
+		Range searchRange = new Range(
+			Vector.Ones(dimensions) * -10.0,
+			Vector.Ones(dimensions) * 12.0
 		);
 
-		Console.WriteLine("Rastrigin minimum: {0}, value: {1}", minimum, function.Evaluate(minimum));
+		Optimizer optimizer = new Optimizer(function, searchRange, dimensions);
+
+		double minimumValue = optimizer.Solve();
+
+		Console.WriteLine(
+			"{0} minimum: {1}, value: {2}",
+			function.Name,
+			optimizer.BestAgent,
+			minimumValue
+		);
 	}
 }

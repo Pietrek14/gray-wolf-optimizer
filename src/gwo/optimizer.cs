@@ -1,22 +1,44 @@
 using System;
 
 namespace GWO {
-	class Optimizer {
+	class Optimizer : IOptimizationAlgorithm {
+		private EvaluationFunction function;
+		private Range searchRange;
+		private uint dimensions;
+
 		Agent[] agents;
-		Agent[] bestThreeAgents;
 		uint maxIterations;
 
-		public Optimizer(uint agentCount = 12, uint maxIterations = 100) {
+		private Agent[] bestThreeAgents;
+		private Random random;
+		private Vector currentBestAgent;
+		private double currentBestValue;
+
+
+		public string Name {
+			get {
+				return "Gray Wolf Optimizer";
+			}
+			set {}
+		}
+
+
+		public Optimizer(EvaluationFunction function, Range searchRange, uint dimensions, uint agentCount = 12, uint maxIterations = 200) {
 			if(agentCount < 3) {
 				throw new ArgumentException(String.Format("Agent count has to be at least three (is {0})", agentCount));
 			}
 
+			this.function = function;
+			this.searchRange = searchRange;
+			this.dimensions = dimensions;
 			agents = new Agent[agentCount];
 			bestThreeAgents = new Agent[3];
 			this.maxIterations = maxIterations;
+
+			this.random = new Random(Guid.NewGuid().GetHashCode());
 		}
 
-		private void CalculateAgentsFitness(IFunction function) {
+		private void CalculateAgentsFitness(EvaluationFunction function) {
 			foreach(Agent agent in agents) {
 				agent.CalculateFitness(function);
 
@@ -44,16 +66,14 @@ namespace GWO {
 			}
 		}
 
-		public Vector Optimize(IFunction function, uint dimensions, Range searchRange) {
-			Random random = new Random(Guid.NewGuid().GetHashCode());
-
+		public double Solve() {
 			// Spawn agents
 			for(uint i = 0; i < agents.Length; i++) {
 				agents[i] = new Agent(searchRange.RandomInRange(random), searchRange);
 			}
 
-			Vector currentBest = null;
-			double currentBestValue = Double.PositiveInfinity;
+			currentBestAgent = null;
+			currentBestValue = Double.PositiveInfinity;
 
 			for(uint i = 0; i < this.maxIterations; i++) {
 				// Calculate the approach factor
@@ -65,14 +85,42 @@ namespace GWO {
 				// Save the current best
 				if(currentBestValue > bestThreeAgents[0].Fitness) {
 					currentBestValue = bestThreeAgents[0].Fitness;
-					currentBest = bestThreeAgents[0].Position;
+					currentBestAgent = bestThreeAgents[0].Position;
 				}
 
 				UpdateAgentsPosition(approachFactor, random);
 			}
 
-			// Return alpha's position
-			return currentBest;
+			// Return the current best 
+			return currentBestValue;
+		}
+
+		public Vector BestAgent {
+			get {
+				return currentBestAgent;
+			}
+			set {}
+		}
+
+		public double[] XBest {
+			get {
+				return BestAgent.vals;
+			}
+			set {}
+		}
+
+		public double FBest {
+			get {
+				return currentBestValue;
+			}
+			set {}
+		}
+
+		public int NumberOfEvaluationFitnessFunction {
+			get {
+				return (int)this.function.EvaluationCalls;
+			}
+			set {}
 		}
 	}
 }
