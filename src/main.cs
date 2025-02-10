@@ -3,8 +3,11 @@ using GWO;
 
 class GrayWolfOptimizerProgram {
 	static void Main() {
-		EvaluationFunction function = new RosenbrockFunction();
 		uint dimensions = 2;
+
+		EvaluationFunction function = new SphereFunction();
+		function.Displacement = Vector.Ones(dimensions);
+
 		Range searchRange = new Range(
 			Vector.Ones(dimensions) * -10.0,
 			Vector.Ones(dimensions) * 12.0
@@ -19,6 +22,10 @@ class GrayWolfOptimizerProgram {
 			function.Name,
 			optimizer.BestAgent,
 			minimumValue
+		);
+		Console.WriteLine(
+			"Evaluation function calls: {0}",
+			optimizer.NumberOfEvaluationFitnessFunction
 		);
 	}
 }

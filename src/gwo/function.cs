@@ -3,6 +3,16 @@ using System;
 namespace GWO {
 	abstract class EvaluationFunction {
 		private uint evaluationCalls = 0;
+		private Vector displacement = null;
+
+		public Vector Displacement {
+			get {
+				return this.displacement;
+			}
+			set {
+				this.displacement = value;
+			}
+		}
 
 		abstract public string Name { get; }
 
@@ -17,7 +27,12 @@ namespace GWO {
 
 		public double Evaluate(Vector args) {
 			evaluationCalls++;
-			return evaluate(args);
+
+			if(this.displacement != null) {
+				return evaluate(args - this.displacement);
+			} else {
+				return evaluate(args);
+			}
 		}
 	}
 
