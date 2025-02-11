@@ -14,7 +14,17 @@ namespace GWO {
 			}
 		}
 
-		abstract public string Name { get; }
+		public string Name {
+			get {
+				if (this.displacement == null) {
+					return this.name;
+				} else {
+					return String.Format("{0} [displaced by {1}]", this.name, this.displacement);
+				}
+			}
+		}
+
+		abstract protected string name { get; }
 
 		public uint EvaluationCalls {
 			get {
@@ -37,7 +47,7 @@ namespace GWO {
 	}
 
 	class RosenbrockFunction : EvaluationFunction {
-		public override string Name {
+		protected override string name {
 			get {
 				return "Rosenbrock";
 			}
@@ -56,7 +66,7 @@ namespace GWO {
 	}
 
 	class BartekFunction : EvaluationFunction {
-		public override string Name {
+		protected override string name {
 			get {
 				return "Bartek";
 			}
@@ -68,7 +78,7 @@ namespace GWO {
 	}
 
 	class SphereFunction : EvaluationFunction {
-		public override string Name {
+		protected override string name {
 			get {
 				return "Sphere";
 			}
@@ -86,7 +96,7 @@ namespace GWO {
 	}
 
 	class RastriginFunction : EvaluationFunction {
-		public override string Name {
+		protected override string name {
 			get {
 				return "Rastrigin";
 			}
@@ -110,7 +120,7 @@ namespace GWO {
 	}
 
 	class BoothFunction : EvaluationFunction {
-		public override string Name {
+		protected override string name {
 			get {
 				return "Booth";
 			}
