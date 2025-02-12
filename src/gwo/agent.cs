@@ -12,9 +12,13 @@ namespace GWO {
 			private set {}
 		}
 
-		public Agent(Vector position, Range searchRange) {
+		private double obstacleFactor;
+
+		public Agent(Vector position, Range searchRange, double obstacleFactor = 2.0) {
 			this.Position = position;
 			this.SearchRange = searchRange;
+
+			this.obstacleFactor = obstacleFactor;
 		}
 
 		public void CalculateFitness(EvaluationFunction function) {
@@ -28,8 +32,8 @@ namespace GWO {
 
 			for(uint i = 0; i < 3; i++) {
 				Vector approachVector = Vector.Ones(Dimensions) * approachFactor;
-				Vector movementVector = 2.0 * approachVector * Vector.Random(Dimensions, random) - approachVector;
-				Vector obstacleVector = 2.0 * Vector.Random(Dimensions, random);
+				Vector movementVector = 2.0 * approachVector * random1 - approachVector;
+				Vector obstacleVector = this.obstacleFactor * random2;
 
 				double distanceFactor = (obstacleVector * bestThreePositions[i] - this.Position).Length();
 

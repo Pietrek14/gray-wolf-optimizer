@@ -5,7 +5,7 @@ class GrayWolfOptimizerProgram {
 	static void Main() {
 		uint dimensions = 2;
 
-		EvaluationFunction function = new RastriginFunction();
+		EvaluationFunction function = new SphereFunction();
 		function.Displacement = new Vector(new[] { 2.0, 1.0 });
 
 		Range searchRange = new Range(

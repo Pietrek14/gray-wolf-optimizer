@@ -7,6 +7,7 @@ namespace GWO {
 		private uint dimensions;
 
 		private double maxApproachFactor;
+		private double obstacleFactor;
 
 		Agent[] agents;
 		uint maxIterations;
@@ -25,7 +26,15 @@ namespace GWO {
 		}
 
 
-		public Optimizer(EvaluationFunction function, Range searchRange, uint dimensions, uint agentCount = 12, uint maxIterations = 200, double maxApproachFactor = 2) {
+		public Optimizer(
+			EvaluationFunction function,
+			Range searchRange,
+			uint dimensions,
+			uint agentCount = 12,
+			uint maxIterations = 200,
+			double maxApproachFactor = 2,
+			double obstacleFactor = 2
+		) {
 			if(agentCount < 3) {
 				throw new ArgumentException(String.Format("Agent count has to be at least three (is {0})", agentCount));
 			}
@@ -37,6 +46,7 @@ namespace GWO {
 			bestThreeAgents = new Agent[3];
 			this.maxIterations = maxIterations;
 			this.maxApproachFactor = maxApproachFactor;
+			this.obstacleFactor = obstacleFactor;
 
 			this.random = new Random(Guid.NewGuid().GetHashCode());
 		}
