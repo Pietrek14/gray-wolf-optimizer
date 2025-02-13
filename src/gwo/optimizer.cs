@@ -10,7 +10,23 @@ namespace GWO {
 		private double obstacleFactor;
 
 		Agent[] agents;
+		public AgentCount {
+			get {
+				return agents.Length;
+			}
+			set {
+				agents = new Agent[value];
+			}
+		};
 		uint maxIterations;
+		public IterationCount {
+			get {
+				return maxIterations;
+			}
+			set {
+				maxIterations = value;
+			}
+		};
 
 		private Agent[] bestThreeAgents;
 		private Random random;
