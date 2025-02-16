@@ -19,7 +19,7 @@ namespace GWO {
 				if (this.displacement == null) {
 					return this.name;
 				} else {
-					return String.Format("{0} [displaced by {1}]", this.name, this.displacement);
+					return String.Format("{0} [displaced by {1}]", this.name, this.displacement.ToPrettyString());
 				}
 			}
 		}
@@ -43,6 +43,10 @@ namespace GWO {
 			} else {
 				return evaluate(args);
 			}
+		}
+
+		public void ResetEvaluationCallsCounter() {
+			evaluationCalls = 0;
 		}
 	}
 

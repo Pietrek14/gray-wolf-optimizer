@@ -4,29 +4,54 @@ namespace GWO {
 	class Optimizer : IOptimizationAlgorithm {
 		private EvaluationFunction function;
 		private Range searchRange;
+
 		private uint dimensions;
+		public uint DimensionCount {
+			get {
+				return dimensions;
+			}
+			set {
+				dimensions = value;
+			}
+		}
 
 		private double maxApproachFactor;
+		public double MaxApproachFactor {
+			get {
+				return maxApproachFactor;
+			}
+			set {
+				maxApproachFactor = value;
+			}
+		}
 		private double obstacleFactor;
+		public double ObstacleFactor {
+			get {
+				return obstacleFactor;
+			}
+			set {
+				obstacleFactor = value;
+			}
+		}
 
 		Agent[] agents;
-		public AgentCount {
+		public uint AgentCount {
 			get {
-				return agents.Length;
+				return (uint)agents.Length;
 			}
 			set {
 				agents = new Agent[value];
 			}
-		};
+		}
 		uint maxIterations;
-		public IterationCount {
+		public uint IterationCount {
 			get {
 				return maxIterations;
 			}
 			set {
 				maxIterations = value;
 			}
-		};
+		}
 
 		private Agent[] bestThreeAgents;
 		private Random random;
@@ -150,6 +175,10 @@ namespace GWO {
 				return (int)this.function.EvaluationCalls;
 			}
 			set {}
+		}
+
+		public void ResetEvaluationCallsCounter() {
+			this.function.ResetEvaluationCallsCounter();
 		}
 	}
 }

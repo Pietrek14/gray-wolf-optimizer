@@ -1,106 +1,37 @@
 using System;
+using System.Collections.Generic;
 using GWO;
-
-class GrayWolfOptimizerTester {
-	IFunction function;
-	Range domain;
-	uint populationSizes[];
-	uint iterationCounts[];
-
-	GrayWolfOptimizer optimizer;
-
-	GrayWolfOptimizerTester(IFunction function, Range domain, uint populationSizes[], uint iterationCounts[]) {
-		this.function = function;
-		this.domain = domain;
-		this.populationSizes = populationSizes;
-		this.iterationCounts = iterationCounts;
-
-		this.optimizer = new GrayWolfOptimizer(function, domain);
-	}
-
-	public class TestCase {
-		public string algorithmName;
-		public string functionName;
-		public uint dimensionCount;
-		public double maxApproachFactor;
-		public double obstacleFactor; 
-		public uint iterationCount;
-		public uint populationSize;
-		public Vector bestSolution;
-		public Vector worstSolution;
-		public Vector solutionStandardDeviation;
-		public double bestValue;
-		public double worstValue;
-		public double valueStandardDeviation;
-
-		public TestCase(
-			string algorithmName,
-			string functionName,
-			uint dimensionCount,
-			double maxApproachFactor,
-			double obstacleFactor,
-			uint iterationCount,
-			uint populationSize,
-			Vector bestSolution,
-			double bestValue,
-			Vector worstSolution,
-			double worstValue,
-			Vector solutionStandardDeviation,
-			double valueStandardDeviation
-		) {
-			this.algorithmName = algorithmName;
-			this.functionName = functionName;
-			this.dimensionCount = dimensionCount;
-			this.maxApproachFactor = maxApproachFactor;
-			this.obstacleFactor = obstacleFactor;
-			this.iterationCount = iterationCount;
-			this.populationSize = populationSize;
-			this.bestSolution = bestSolution;
-			this.bestValue = bestValue;
-			this.worstSolution = worthSolution;
-			this.worstValue = worthValue;
-			this.solutionStandardDeviation = solutionStandardDeviation;
-			this.valueStandardDeviation = valueStandardDeviation;
-		}
-	};
-
-	TestCase[] RunTests(uint retryCount = 10) {
-		TestCase[] result = new TestCase[this.populationSizes.Length];
-		uint index = 0;
-
-		foreach(uint populationSize in populationSizes) {
-			foreach(uint iterationCount in iterationCounts) {
-
-			}
-		}
-	}
-}
 
 class GrayWolfOptimizerProgram {
 	static void Main() {
-		uint dimensions = 2;
+		uint[] dimensionCounts = { 2, 3, 6, 10 };
 
-		EvaluationFunction function = new SphereFunction();
-		function.Displacement = new Vector(new[] { 2.0, 1.0 });
+		var testResults = new List<Tester.TestCase>();
 
-		Range searchRange = new Range(
-			Vector.Ones(dimensions) * -10.0,
-			Vector.Ones(dimensions) * 12.0
-		);
+		foreach(uint dimensions in dimensionCounts) {
+			EvaluationFunction function = new RosenbrockFunction();
 
-		Optimizer optimizer = new Optimizer(function, searchRange, dimensions);
+			Range searchRange = new Range(
+				Vector.Ones(dimensions) * -10.0,
+				Vector.Ones(dimensions) * 12.0
+			);
 
-		double minimumValue = optimizer.Solve();
+			Tester tester = new Tester(
+				function,
+				searchRange,
+				dimensions,
+				new uint[] { 10, 20, 40, 80 },
+				new uint[] { 5, 10, 20, 40, 60, 80 }
+			);
 
-		Console.WriteLine(
-			"{0} minimum: {1}, value: {2}",
-			function.Name,
-			optimizer.BestAgent,
-			minimumValue
-		);
-		Console.WriteLine(
-			"Evaluation function calls: {0}",
-			optimizer.NumberOfEvaluationFitnessFunction
-		);
+			Tester.TestCase[] currentResults = tester.RunTests();
+
+			foreach(var result in currentResults) {
+				testResults.Add(result);
+			}
+		}
+
+		var outputter = new CSVTestCaseOutputter();
+		outputter.Output(testResults.ToArray());
 	}
 }

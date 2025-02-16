@@ -148,6 +148,24 @@ namespace GWO {
 			return vector * scalar;
 		}
 
+		public static Vector operator /(Vector vector1, Vector vector2) {
+			if(vector1.Dimensions() != vector2.Dimensions()) {
+				throw new MismatchedSizeException(
+					String.Format("Can't divide two vectors with different dimensions! ({0}, {1})",
+					vector1.Dimensions(),
+					vector2.Dimensions()
+				));
+			}
+
+			Vector result = new Vector(vector1.Dimensions());
+
+			for(uint i = 0; i < vector1.Dimensions(); i++) {
+				result.vals[i] = vector1.vals[i] / vector2.vals[i];
+			}
+
+			return result;
+		}
+
 		public static Vector operator /(Vector vector, double scalar) {
 			Vector result = new Vector(vector.Dimensions());
 
@@ -158,7 +176,7 @@ namespace GWO {
 			return result;
 		}
 
-		public Vector dot(Vector vector) {
+		public Vector Dot(Vector vector) {
 			if(this.Dimensions() != vector.Dimensions()) {
 				throw new MismatchedSizeException(
 					String.Format("Can't calculate a dot product of two vectors with different dimensions! ({0}, {1})",
@@ -176,12 +194,25 @@ namespace GWO {
 			return result;
 		}
 
-		public override string ToString()
-		{
+		public Vector Sqrt() {
+			Vector result = new Vector(this.Dimensions());
+
+			for(uint i = 0; i < this.Dimensions(); i++) {
+				result.vals[i] = Math.Sqrt(this.vals[i]);
+			}
+
+			return result;
+		}
+
+		public override string ToString() {
 			string typeName = String.Format("{0}d vector", this.Dimensions());
 			string data = String.Join(", ", this.vals);
 
 			return String.Format("{0} {{{1}}}", typeName, data);
+		}
+
+		public string ToPrettyString() {
+			return String.Format("({0})", String.Join(", ", this.vals));
 		}
 	}
 }
