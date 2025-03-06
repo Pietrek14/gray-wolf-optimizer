@@ -1,4 +1,5 @@
 using System;
+using Metaheuristics;
 
 namespace GWO {
 	class Optimizer : IOptimizationAlgorithm {

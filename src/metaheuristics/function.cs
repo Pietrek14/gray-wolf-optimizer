@@ -1,6 +1,6 @@
 using System;
 
-namespace GWO {
+namespace Metaheuristics {
 	abstract class EvaluationFunction {
 		private uint evaluationCalls = 0;
 		private Vector displacement = null;

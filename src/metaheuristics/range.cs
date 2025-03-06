@@ -1,6 +1,6 @@
 using System;
 
-namespace GWO {
+namespace Metaheuristics {
 	class Range {
 		Vector min, max;
 
