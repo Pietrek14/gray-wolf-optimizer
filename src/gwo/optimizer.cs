@@ -2,39 +2,51 @@ using System;
 using Metaheuristics;
 
 namespace GWO {
-	class Optimizer : IOptimizationAlgorithm {
+	class Params : ICustomParameters {
+		public double MaxApproachFactor;
+		public double ObstacleFactor;
+
+		public Params(double maxApproachFactor, double obstacleFactor) {
+			MaxApproachFactor = maxApproachFactor;
+			ObstacleFactor = obstacleFactor;
+		}
+
+		public static Params[] Combinations(
+			double[] maxApproachFactors,
+			double[] obstacleFactors
+		) {
+			Params[] result = new Params[
+				maxApproachFactors.Length * obstacleFactors.Length
+			];
+			uint index = 0;
+
+			foreach(double maxApproachFactor in maxApproachFactors) {
+				foreach(double obstacleFactor in obstacleFactors) {
+					result[index] = new Params(maxApproachFactor, obstacleFactor);
+					index++;
+				}
+			}
+
+			return result;
+		}
+
+		public string[] ParameterNames { get {
+			return new string[] { "Współczynnik podejścia", "Współczynnik przeszkody" };
+		}}
+
+		public string[] ParameterValues { get {
+			return new string[] {
+				MaxApproachFactor.ToString(),
+				ObstacleFactor.ToString()
+			};
+		}}
+	}
+
+	class Optimizer : ITestable<Optimizer, Params> {
 		private EvaluationFunction function;
 		private Range searchRange;
 
-		private uint dimensions;
-		public uint DimensionCount {
-			get {
-				return dimensions;
-			}
-			set {
-				dimensions = value;
-			}
-		}
-
-		private double maxApproachFactor;
-		public double MaxApproachFactor {
-			get {
-				return maxApproachFactor;
-			}
-			set {
-				maxApproachFactor = value;
-			}
-		}
-		private double obstacleFactor;
-		public double ObstacleFactor {
-			get {
-				return obstacleFactor;
-			}
-			set {
-				obstacleFactor = value;
-			}
-		}
-
+		public uint DimensionCount;
 		Agent[] agents;
 		public uint AgentCount {
 			get {
@@ -44,15 +56,8 @@ namespace GWO {
 				agents = new Agent[value];
 			}
 		}
-		uint maxIterations;
-		public uint IterationCount {
-			get {
-				return maxIterations;
-			}
-			set {
-				maxIterations = value;
-			}
-		}
+		public uint IterationCount;
+		public Params CustomParameters;
 
 		private Agent[] bestThreeAgents;
 		private Random random;
@@ -66,7 +71,6 @@ namespace GWO {
 			}
 			set {}
 		}
-
 
 		public Optimizer(
 			EvaluationFunction function,
@@ -83,12 +87,11 @@ namespace GWO {
 
 			this.function = function;
 			this.searchRange = searchRange;
-			this.dimensions = dimensions;
+			this.DimensionCount = dimensions;
 			agents = new Agent[agentCount];
 			bestThreeAgents = new Agent[3];
-			this.maxIterations = maxIterations;
-			this.maxApproachFactor = maxApproachFactor;
-			this.obstacleFactor = obstacleFactor;
+			this.IterationCount = maxIterations;
+			this.CustomParameters = new Params(maxApproachFactor, obstacleFactor);
 
 			this.random = new Random(Guid.NewGuid().GetHashCode());
 		}
@@ -124,15 +127,16 @@ namespace GWO {
 		public double Solve() {
 			// Spawn agents
 			for(uint i = 0; i < agents.Length; i++) {
-				agents[i] = new Agent(searchRange.RandomInRange(random), searchRange);
+				agents[i] = new Agent(searchRange.RandomInRange(random), searchRange, CustomParameters.ObstacleFactor);
 			}
 
 			currentBestAgent = null;
 			currentBestValue = Double.PositiveInfinity;
 
-			for(uint i = 0; i < this.maxIterations; i++) {
+			for(uint i = 0; i < this.IterationCount; i++) {
 				// Calculate the approach factor
-				double approachFactor = this.maxApproachFactor - (this.maxApproachFactor * i / this.maxIterations);
+				double approachFactor = this.CustomParameters.MaxApproachFactor
+					- (this.CustomParameters.MaxApproachFactor * i / this.IterationCount);
 
 				// Update agents
 				CalculateAgentsFitness(function);
@@ -180,6 +184,13 @@ namespace GWO {
 
 		public void ResetEvaluationCallsCounter() {
 			this.function.ResetEvaluationCallsCounter();
+		}
+
+		public void Reconfigure(Tester<Optimizer, Params>.TestCase testCase) {
+			this.DimensionCount = testCase.DimensionCount;
+			this.AgentCount = testCase.PopulationSize;
+			this.IterationCount = testCase.IterationCount;
+			this.CustomParameters = testCase.CustomParameters;
 		}
 	}
 }

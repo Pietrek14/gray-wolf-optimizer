@@ -1,8 +1,11 @@
 using System;
 
-namespace GWO {
-    abstract class TestCaseOutputter {
-        abstract public void Output(Tester.TestCase[] testCases);
+namespace Metaheuristics {
+    abstract class TestResultOutputter<T, P>
+        where P : ICustomParameters
+        where T : ITestable<T, P>
+    {
+        abstract public void Output(Tester<T, P>.TestResult[] TestResults);
 
         /// Use these instead of raw output to console.
         /// In the future there will be an option to output to a file,
@@ -16,38 +19,42 @@ namespace GWO {
         }
     };
 
-    class LatexTestCaseOutputter : TestCaseOutputter {
+    class LatexTestResultOutputter<T, P> : TestResultOutputter<T, P>
+        where P : ICustomParameters
+        where T : ITestable<T, P>
+    {
         private bool headers;
 
-        public LatexTestCaseOutputter(bool headers = true) {
+        public LatexTestResultOutputter(bool headers = true) {
             this.headers = headers;
         }
 
-        override public void Output(Tester.TestCase[] testCases) {
+        override public void Output(Tester<T, P>.TestResult[] testResults) {
             this.OutLine(@"\begin{table}[H]");
             this.OutLine(@"\begin{tabular}{[|c|c|c|c|c|c|c|c|c|c|c|]}");
             this.OutLine(@"\hline");
 
             if(this.headers) {
                 this.OutLine(
-                    @"Algorytm & Funkcja testowa & Liczba szukanych parametrów & Współczynnik podejścia
-& Współczynnik przeszkody & Liczba iteracji & Rozmiar populacji & Znalezione minimum
+                    @"Algorytm & Funkcja testowa & Liczba szukanych parametrów &" + 
+                    string.Join(" & ", testResults[0].TestCase.CustomParameters.ParameterNames)
+                    + @"& Liczba iteracji & Rozmiar populacji & Znalezione minimum
 & Odchylenie standardowe poszukiwanych parametrów & Wartość funkcji celu
 & Odchylenie standardowe wartości funkcji celu & Liczba wywołań funkcji celu \\"
                 );
                 this.OutLine(@"\hline");
             }
 
-            foreach(var testCase in testCases) {
+            foreach(var testResult in testResults) {
                 this.OutLine(
                     String.Format(
-                        @"{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} & {9} & {10} & {11} \\",
-                        testCase.algorithmName, testCase.functionName, testCase.dimensionCount,
-                        testCase.maxApproachFactor, testCase.obstacleFactor,
-                        testCase.iterationCount, testCase.populationSize,
-                        testCase.bestSolution.ToPrettyString(), testCase.solutionStandardDeviation.ToPrettyString(),
-                        testCase.bestValue, testCase.valueStandardDeviation,
-                        testCase.evaluationFunctionCalls
+                        @"{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} & {9} & {10} \\",
+                        testResult.AlgorithmName, testResult.FunctionName, testResult.TestCase.DimensionCount,
+                        string.Join(" & ", testResult.TestCase.CustomParameters.ParameterValues),
+                        testResult.TestCase.IterationCount, testResult.TestCase.PopulationSize,
+                        testResult.BestSolution.ToPrettyString(), testResult.SolutionStandardDeviation.ToPrettyString(),
+                        testResult.BestValue, testResult.ValueStandardDeviation,
+                        testResult.EvaluationFunctionCalls
                     )
                 );
             }
@@ -58,33 +65,37 @@ namespace GWO {
         }
     }
 
-    class CSVTestCaseOutputter : TestCaseOutputter {
+    class CSVTestResultOutputter<T, P> : TestResultOutputter<T, P>
+        where P : ICustomParameters
+        where T : ITestable<T, P>
+    {
         private bool headers;
 
-        public CSVTestCaseOutputter(bool headers = true) {
+        public CSVTestResultOutputter(bool headers = true) {
             this.headers = headers;
         }
 
-        override public void Output(Tester.TestCase[] testCases) {
+        override public void Output(Tester<T, P>.TestResult[] testResults) {
             if(this.headers) {
                 this.OutLine(
-                    "Algorytm;Funkcja testowa;Liczba szukanych parametrów;Współczynnik podejścia;Współczynnik przeszkody;"
-                    + "Liczba iteracji;Rozmiar populacji;Znalezione minimum;"
+                    "Algorytm;Funkcja testowa;Liczba szukanych parametrów;"
+                    + string.Join(";", testResults[0].TestCase.CustomParameters.ParameterNames)
+                    + ";Liczba iteracji;Rozmiar populacji;Znalezione minimum;"
                     + "Odchylenie standardowe poszukiwanych parametrów;Wartość funkcji celu;"
                     + "Odchylenie standardowe wartości funkcji celu;Liczba wywołań funkcji celu"
                 );
             }
 
-            foreach(var testCase in testCases) {
+            foreach(var testResult in testResults) {
                 this.OutLine(
                     String.Format(
-                        "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11}",
-                        testCase.algorithmName, testCase.functionName, testCase.dimensionCount,
-                        testCase.maxApproachFactor, testCase.obstacleFactor,
-                        testCase.iterationCount, testCase.populationSize,
-                        testCase.bestSolution.ToPrettyString(), testCase.solutionStandardDeviation.ToPrettyString(),
-                        testCase.bestValue, testCase.valueStandardDeviation,
-                        testCase.evaluationFunctionCalls
+                        "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10}",
+                        testResult.AlgorithmName, testResult.FunctionName, testResult.TestCase.DimensionCount,
+                        string.Join(";", testResult.TestCase.CustomParameters.ParameterValues),
+                        testResult.TestCase.IterationCount, testResult.TestCase.PopulationSize,
+                        testResult.BestSolution.ToPrettyString(), testResult.SolutionStandardDeviation.ToPrettyString(),
+                        testResult.BestValue, testResult.ValueStandardDeviation,
+                        testResult.EvaluationFunctionCalls
                     )
                 );
             }

@@ -1,7 +1,7 @@
 using System;
 
 namespace Metaheuristics {
-	class Vector {
+	public class Vector {
 		public double[] vals;
 
 		public Vector(uint dimensions) {
