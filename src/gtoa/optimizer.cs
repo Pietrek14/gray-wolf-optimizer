@@ -173,9 +173,11 @@ namespace GTOA {
 			// Teacher phase
 
 			// Average group
+			double averageLearningFactor = random.NextDouble();
+
 			for(uint i = 0; i < StudentCount / 2; i++) {
 				Agent newStudent = new Agent(
-					students[i].Position + 2 * random.NextDouble() * (teacher.Position - students[i].Position)
+					students[i].Position + 2 * averageLearningFactor * (teacher.Position - students[i].Position)
 				);
 
 				newStudent.Evaluate(this.function);
@@ -193,12 +195,13 @@ namespace GTOA {
 			// StudentCount may be odd
 			mean /= StudentCount - (StudentCount / 2);
 
-			for(uint i = StudentCount / 2; i < StudentCount; i++) {
-				double conformism = random.NextDouble();
+			double outstandingLearningFactor = random.NextDouble();
+			double conformism = random.NextDouble();
 
+			for(uint i = StudentCount / 2; i < StudentCount; i++) {
 				Agent newStudent = new Agent(
 					students[i].Position
-					+ random.NextDouble() * (
+					+ outstandingLearningFactor * (
 						teacher.Position - CustomParameters.TeachingFactor * (
 							conformism * mean
 							+ (1 - conformism) * students[i].Position
@@ -212,6 +215,9 @@ namespace GTOA {
 			}
 	
 			// Student phase
+			double unsignedColearningFactor = random.NextDouble();
+			double inertiaFactor = random.NextDouble();
+
 			for(uint i = 0; i < StudentCount; i++) {
 				uint classmateIndex = (uint)random.Next(0, (int)(StudentCount - 1));
 				if(classmateIndex >= i) {
@@ -219,13 +225,13 @@ namespace GTOA {
 				}
 				Agent classmate = students[classmateIndex];
 
-				double colearningFactor = random.NextDouble()
+				double colearningFactor = unsignedColearningFactor
 					* (students[i].Fitness < classmate.Fitness ? 1 : -1);
 
 				Agent newStudent = new Agent(
 					students[i].Position
 						+ colearningFactor * (students[i].Position - classmate.Position)
-						+ random.NextDouble() * (students[i].Position - prevStudents[i].Position)
+						+ inertiaFactor * (students[i].Position - prevStudents[i].Position)
 				);
 
 				newStudent.Evaluate(this.function);

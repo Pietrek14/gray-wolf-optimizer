@@ -1,0 +1,2 @@
+Algorytm;Funkcja testowa;Liczba szukanych parametrów;Współczynnik podejścia;Współczynnik przeszkody;Liczba iteracji;Rozmiar populacji;Znalezione minimum;Odchylenie standardowe poszukiwanych parametrów;Wartość funkcji celu;Odchylenie standardowe wartości funkcji celu;Liczba wywołań funkcji celu
+Gray Wolf Optimizer;GTOA Parametrization [displaced by (2, 1, 1)];3;2;2;40;40;(100, 36.1222761789265, 0.5);(0.267572544605953, 14.9766647869981, 0.368419664942195);0;0;1600

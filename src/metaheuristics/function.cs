@@ -134,4 +134,67 @@ namespace Metaheuristics {
 			return Math.Pow(args.vals[0] + 2 * args.vals[1] - 7, 2) + Math.Pow(2 * args.vals[0] + args.vals[1] - 5, 2);
 		}
 	}
+
+	class GTOAParametrizationFunction : EvaluationFunction {
+		protected override string name {
+			get {
+				return "GTOA Parametrization";
+			}
+		}
+
+		GTOA.Optimizer optimizer;
+		EvaluationFunction function;
+		Vector expectedSolution;
+		Range searchRange;
+		uint dimensionCount;
+		Tester<GTOA.Optimizer, GTOA.Params> tester;
+
+		public GTOAParametrizationFunction(
+			EvaluationFunction _function,
+			Range _searchRange,
+			uint _dimensionCount,
+			Vector _expectedSolution
+		) {
+			function = _function;
+			searchRange = _searchRange;
+			dimensionCount = _dimensionCount;
+			expectedSolution = _expectedSolution;
+			optimizer = new GTOA.Optimizer(
+				function,
+				searchRange,
+				dimensionCount
+			);
+
+			tester = new Tester<GTOA.Optimizer, GTOA.Params>(
+				optimizer,
+				function,
+				searchRange
+			);
+		}
+
+		protected override double evaluate(Vector args) {
+			uint iterationCount = (uint)Math.Floor(args.vals[0]);
+			uint populationSize = (uint)Math.Floor(args.vals[1]);
+			var parameters = new GTOA.Params(args.vals[2]);
+
+			Tester<GTOA.Optimizer, GTOA.Params>.TestResult[] results = tester.RunTests(
+				new Tester<GTOA.Optimizer, GTOA.Params>.TestCase[] {
+					new Tester<GTOA.Optimizer, GTOA.Params>.TestCase(
+						dimensionCount,
+						iterationCount,
+						populationSize,
+						parameters
+					)
+				}
+			);
+
+			var result = results[0];
+
+			var distanceToSolution = (result.BestSolution - expectedSolution).Length();
+
+			return distanceToSolution
+				* result.EvaluationFunctionCalls
+				* result.SolutionVariancy.Length();
+		}
+	}
 }
